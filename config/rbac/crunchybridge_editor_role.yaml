@@ -1,0 +1,24 @@
+# permissions for end users to edit crunchybridges.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: crunchybridge-editor-role
+rules:
+- apiGroups:
+  - crunchybridge.com
+  resources:
+  - crunchybridges
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - crunchybridge.com
+  resources:
+  - crunchybridges/status
+  verbs:
+  - get
