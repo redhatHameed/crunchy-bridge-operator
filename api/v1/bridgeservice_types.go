@@ -25,17 +25,39 @@ import (
 
 // BridgeServiceSpec defines the desired state of BridgeService
 type BridgeServiceSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of BridgeService. Edit bridgeservice_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// The secret storing the crunchy bridge api connection credentials(application id and secret) to use for generating token with the API endpoint. The secret may be placed in a separate NamespacedName
+	CredentialsRef string `json:"credentialsRef"`
 }
 
 // BridgeServiceStatus defines the observed state of BridgeService
 type BridgeServiceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+
+	// A list of instances returned from querying the API
+	Instances []Instance `json:"instances,omitempty"`
+}
+
+type Instance struct {
+	// The ID of the Cluster
+	ID string `json:"id,omitempty"`
+
+	// The Name of the Cluster
+	Name string `json:"name,omitempty"`
+
+	// other  information related to this instance
+	InstanceInfo InstanceInfo `json:"extraInfo,omitempty"`
+}
+
+type InstanceInfo struct {
+
+	// ProviderId is the cloud provider Id
+	ProviderId string `json:"provider_id,omitempty"`
+
+	// RegionID is the region of cloud provider
+	RegionId string `json:"region_id,omitempty"`
+
+	// the type of the instance (‘primary’ or ‘read_replica’)
+	Type string `json:"type,omitempty"`
 }
 
 //+kubebuilder:object:root=true

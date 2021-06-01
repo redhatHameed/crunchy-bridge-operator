@@ -36,13 +36,42 @@ spec:
           spec:
             description: BridgeServiceSpec defines the desired state of BridgeService
             properties:
-              foo:
-                description: Foo is an example field of BridgeService. Edit bridgeservice_types.go
-                  to remove/update
+              credentialsRef:
+                description: The secret storing the crunchy bridge api connection
+                  credentials(application id and secret) to use for generating token
+                  with the API endpoint. The secret may be placed in a separate NamespacedName
                 type: string
+            required:
+            - credentialsRef
             type: object
           status:
             description: BridgeServiceStatus defines the observed state of BridgeService
+            properties:
+              instances:
+                description: A list of instances returned from querying the API
+                items:
+                  properties:
+                    extraInfo:
+                      description: other  information related to this instance
+                      properties:
+                        provider_id:
+                          description: ProviderId is the cloud provider Id
+                          type: string
+                        region_id:
+                          description: RegionID is the region of cloud provider
+                          type: string
+                        type:
+                          description: the type of the instance (‘primary’ or ‘read_replica’)
+                          type: string
+                      type: object
+                    id:
+                      description: The ID of the Cluster
+                      type: string
+                    name:
+                      description: The Name of the Cluster
+                      type: string
+                  type: object
+                type: array
             type: object
         type: object
     served: true
