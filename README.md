@@ -8,6 +8,12 @@
 - see [operator-sdk documentation](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/) for further info
 
 ## Running the Operator
+1. you will need you Application ID and Application Secret,to create a secret. See more [API Reference](https://docs.crunchybridge.com/api/getting_started)
+
+Create a Secret with below command by pass 
+```
+kubectl create secret generic crunchy-bridge-api-key  --from-literal="publicApiKey=<Application Secret>"   --from-literal="privateApiSecret=<>"   -n crunchy-bridge-operator-system
+```
 
 ### Prerequisite Tools
 

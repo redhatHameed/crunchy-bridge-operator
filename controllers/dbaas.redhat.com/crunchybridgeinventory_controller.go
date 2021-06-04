@@ -18,9 +18,8 @@ package dbaasredhatcom
 
 import (
 	"context"
-
+	"github.com/CrunchyData/crunchy-bridge-operator/controllers/dbaas.redhat.com/resources"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -62,8 +61,38 @@ func (r *CrunchyBridgeInventoryReconciler) Reconcile(ctx context.Context, req ct
 		logger.Error(err, "Error fetching CrunchyBridgeInventory for reconcile")
 		return ctrl.Result{}, err
 	}
-	//
 
+	/*// try and find matching Registration ConfigMap else create it
+	existingConfigMap := resources.BridgeRegistrationConfigMap(&inventory)
+	err = r.Get(ctx, client.ObjectKeyFromObject(existingConfigMap), existingConfigMap)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			// matching ConfigMap has not yet been created, make one with ownerReference
+			bridgeRegistrationConfigMap := resources.OwnedBridgeRegistrationConfigMap(&inventory)
+			_, err = controllerutil.CreateOrUpdate(ctx, r.Client, bridgeRegistrationConfigMap, func() error {
+				bridgeRegistrationConfigMap.Data = resources.BridgeRegistrationConfigMapData()
+				return nil
+			})
+			if err != nil {
+				logger.Error(err, "error creating new connection ConfigMap")
+				return ctrl.Result{}, err
+			}
+		} else {
+			// error fetching resource instance, requeue and try again
+			logger.Error(err, "error fetching matching ConfigMap, requeuing")
+			return ctrl.Result{}, err
+		}
+	}*/
+	// try and find matching Secret
+	connectionAPIKeys, err := resources.ReadAPIKeysFromSecret(r.Client, ctx, &inventory)
+	//err = r.Get(ctx, client.ObjectKeyFromObject(existingSecret), existingSecret)
+	if err != nil {
+		// error fetching resource instance, requeue and try again
+		logger.Error(err, "error fetching matching Secret")
+		return ctrl.Result{}, err
+	}
+	//TODO need to remove from logs
+	logger.Info("CrunchyBridgeInventory ", "connectionAPIKeys", connectionAPIKeys)
 	return ctrl.Result{}, nil
 }
 
