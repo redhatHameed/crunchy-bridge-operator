@@ -18,7 +18,6 @@ package dbaasredhatcom
 
 import (
 	"context"
-	"errors"
 	"net/url"
 
 	dbaasredhatcomv1alpha1 "github.com/CrunchyData/crunchy-bridge-operator/apis/dbaas.redhat.com/v1alpha1"
@@ -101,6 +100,7 @@ func (r *CrunchyBridgeInventoryReconciler) Reconcile(ctx context.Context, req ct
 
 // setupClient
 func setupClient(client client.Client, inventory dbaasredhatcomv1alpha1.CrunchyBridgeInventory, APIBaseURL string, logger logr.Logger) (*bridgeapi.Client, error) {
+
 	baseUrl, err := url.Parse(APIBaseURL)
 	if err != nil {
 		logger.Error(err, "Malformed URL", "URL", APIBaseURL)
@@ -115,17 +115,16 @@ func setupClient(client client.Client, inventory dbaasredhatcomv1alpha1.CrunchyB
 	}
 
 	// Check that the KSP is returning a useful value
-	testCred, err := kubeSecretProvider.ProvideCredential()
+	_, err = kubeSecretProvider.ProvideCredential()
 	if err != nil {
 		return nil, err
-	} else if testCred.Zero() {
-		// Login credential secret is a prerequisite for DBaaS operation, so
-		// return error if set to empty
-		return nil, errors.New("API secret initialized to zero values")
 	}
 
 	// Initialize login with known good provider
-	bridgeapi.SetLogin(kubeSecretProvider, baseUrl)
+	err = bridgeapi.SetLogin(kubeSecretProvider, baseUrl)
+	if err != nil {
+		return nil, err
+	}
 
 	bridgeapiClient := &bridgeapi.Client{
 		APITarget: baseUrl,
